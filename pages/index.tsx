@@ -1,16 +1,34 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 
 export default function Home() {
-	const [activated, setActivated] = useState(false);
+	const [workerRequested, setWorkerRequested] = useState(false);
+	const [workerReady, setWorkerReady] = useState(false);
 	const [workerMessage, setWorkerMessage] = useState<string>();
+	const workerRef = useRef<Worker>();
 
 	useEffect(() => {
-		if (activated) {
-			console.log('Init Web Worker...');
+		if (workerRequested && !workerRef.current) {
+			console.log('Initializing Web Worker...');
+			const worker = new Worker('/static.worker.js');
+			worker.onmessage = ((event: MessageEvent<string>) => {
+				setWorkerMessage(event.data);
+			});
+			workerRef.current = worker;
+			setWorkerReady(true);
 		}
-	}, [activated]);
+
+		return () => {
+			if (workerRef.current) {
+				console.log('Terminating Web Worker...');
+				workerRef.current.terminate();
+				workerRef.current = undefined;
+				setWorkerRequested(false);
+				setWorkerReady(false);
+			}
+		};
+	}, [workerRequested]);
 
 	return (
 		<>
@@ -29,9 +47,9 @@ export default function Home() {
 						className={styles.button}
 						type="button"
 						onClick={() => {
-							setActivated(true);
+							setWorkerRequested(true);
 						}}
-						disabled={activated}
+						disabled={workerRequested}
 					>
 						Init Web Worker
 					</button>
@@ -40,8 +58,11 @@ export default function Home() {
 						className={styles.button}
 						type="button"
 						onClick={() => {
-							console.log('TODO: Send Message');
+							const messageToWorker = Date.now();
+							console.log('Sending message to worker:', messageToWorker);
+							workerRef.current?.postMessage(messageToWorker);
 						}}
+						disabled={!workerReady}
 					>
 						Send Message
 					</button>
