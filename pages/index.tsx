@@ -11,12 +11,17 @@ export default function Home() {
 	useEffect(() => {
 		if (workerRequested && !workerRef.current) {
 			console.log('Initializing Web Worker...');
-			const worker = new Worker('/static.worker.js');
-			worker.onmessage = ((event: MessageEvent<string>) => {
-				setWorkerMessage(event.data);
-			});
-			workerRef.current = worker;
-			setWorkerReady(true);
+			try {
+				const worker = new Worker('../workers/example.worker', { type: 'module' });
+				worker.onmessage = ((event: MessageEvent<string>) => {
+					setWorkerMessage(event.data);
+				});
+				workerRef.current = worker;
+				setWorkerReady(true);
+			} catch (err) {
+				console.error(err);
+				setWorkerMessage('Worker initialization failed. See console for details.');
+			}
 		}
 
 		return () => {
@@ -26,6 +31,7 @@ export default function Home() {
 				workerRef.current = undefined;
 				setWorkerRequested(false);
 				setWorkerReady(false);
+				setWorkerMessage(undefined);
 			}
 		};
 	}, [workerRequested]);

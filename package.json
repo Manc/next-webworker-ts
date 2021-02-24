@@ -2,15 +2,17 @@
   "name": "next-ts-webworker",
   "version": "0.1.0",
   "private": true,
+  "license": "Unlicense",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
-    "next": "10.0.7",
+    "next": "10.0.5",
     "react": "17.0.1",
-    "react-dom": "17.0.1"
+    "react-dom": "17.0.1",
+    "worker-plugin": "^5.0.0"
   },
   "devDependencies": {
     "@types/node": "^14.14.31",
