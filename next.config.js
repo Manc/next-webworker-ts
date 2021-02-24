@@ -3,6 +3,10 @@ const WorkerPlugin = require('worker-plugin');
 const isProd = process.env.NODE_ENV === 'production';
 
 const nextConfig = {
+	// future: {
+	// 	webpack5: true,
+	// },
+
 	/* Use this option to simulate a different assets origin only in the production build: */
 	assetPrefix: isProd ? 'http://127.0.0.1:3000' : '',
 
