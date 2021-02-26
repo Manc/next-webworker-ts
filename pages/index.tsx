@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 
+import ExampleWorker from '../workers/example.worker.ts';
+
 export default function Home() {
 	const [workerRequested, setWorkerRequested] = useState(false);
 	const [workerReady, setWorkerReady] = useState(false);
@@ -10,9 +12,8 @@ export default function Home() {
 
 	useEffect(() => {
 		if (workerRequested && !workerRef.current) {
-			console.log('Initializing Web Worker...');
 			try {
-				const worker = new Worker('../workers/example.worker', { type: 'module' });
+				const worker = new ExampleWorker();
 				worker.onmessage = ((event: MessageEvent<string>) => {
 					setWorkerMessage(event.data);
 				});
